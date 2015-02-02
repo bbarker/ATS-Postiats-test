@@ -28,15 +28,15 @@ staload "P2-bbarker.sats"
 implement
 mysum (x_n2, x_n1, t) = let
 //
-prval pf0 = MYSUM(n2, n1, t(* should be 2 here *))
+prval pf0 = MYSUM_BAS(x_n2, x_n1, t)
 //
 fun
 loop
 {ln2,ln1,lt:nat}
 (
-  pf1: MYSUM(ln1, ln2, lt)
-  | x_n1: int ln1, x_n2: int ln2, t: int lt
-) : [t1:int | t1 >= t] (MYSUM (ln1 + ln2, ln1, t1) | int t1) = let
+  pf1: MYSUM(ln2, ln1, lt)
+  | x_n2: int ln2, x_n1: int ln1, t: int lt
+) : [t1:nat] (MYSUM (ln1, ln1 + ln2, t1) | int t1) = let
 //
 val x_n = x_n1 + x_n2
 //
@@ -49,11 +49,11 @@ in
 //
 if
 x_n > LIMIT
-then (pf1 | t)
+then (MYSUM_un_fin(pf1) | t)
 else (
   if nmod(x_n, 2) = 0
-    then loop( MYSUM(ln1 + ln2, ln1, lt + ln1 + ln2) | x_n, x_n1, t + x_n)
-    else loop( MYSUM(ln1 + ln2, ln1, lt) | x_n, x_n1, t)
+    then loop( MYSUM_un_inc(pf1) | x_n1, x_n, t + x_n)
+    else loop( MYSUM_un_same(pf1) | x_n1, x_n, t)
   // end of [if]
 ) (* end of [else] *)
 end // end of [if]
@@ -74,7 +74,9 @@ implement
 main0 () =
 {
 //
-val (pf | ans) = mysum(2, 1, 2)
+val (pf | ans) = mysum(1, 2, 2)
+// We should now verify pf is MYSUM_fin
+
 prval pf_final = MYSUM_sat(pf) // Ideally this would be implemented.
 val () = println! ("The sum of all the even fibs < ", LIMIT, " equals ", ans)
 //

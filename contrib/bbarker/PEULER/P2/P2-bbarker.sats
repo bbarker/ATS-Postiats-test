@@ -42,13 +42,13 @@ dataprop MYSUM
 ) =
   | {n2,n1:nat | n1 + n2 > LIMIT}
     {t1:int}
-    MYSUM (n2, n1, t1) of MYSUM (n2, n1, t1)
+    MYSUM_fin (n2, n1 + n2, t1) of MYSUM (n2, n1, t1)
   | {n2,n1:nat | n1 + n2 <= LIMIT; (n1 + n2) mod 2 > 0}
     {t1:int}
-    MYSUM (n1, n1 + n2, t1) of MYSUM (n2, n1, t1)
+    MYSUM_same (n1, n1 + n2, t1) of MYSUM (n2, n1, t1)
   | {n2,n1:nat | n1 + n2 <= LIMIT; (n1 + n2) mod 2 == 0}
     {t1:int}
-    MYSUM (n1, n1 + n2, n1 + n2 + t1) of MYSUM (n2, n1, t1)
+    MYSUM_inc (n1, n1 + n2, n1 + n2 + t1) of MYSUM (n2, n1, t1)
 // end of [MYSUM]
 
 (* ****** ****** *)
@@ -70,9 +70,34 @@ MYSUM_sat
   (pf1: MYSUM(n2, n1, t)):
   ($P2.FIB(n2, n1+n2), $P2.MYSUM(n2, t))
 
+
+praxi
+MYSUM_un_same
+  {n1,n2,t:nat | n1 + n2 <= LIMIT; (n1 + n2) mod 2 > 0}
+  (pf1: MYSUM(n2, n1, t)): MYSUM(n1, n1 + n2, t)
+//
+praxi
+MYSUM_un_fin
+  {n1,n2,t:nat | n1 + n2 > LIMIT}
+  (pf1: MYSUM(n2, n1, t)): MYSUM(n1, n1 + n2, t)
+//
+praxi
+MYSUM_un_inc
+  {n1,n2,t:nat | n1 + n2 <= LIMIT; (n1 + n2) mod 2 == 0}
+  (pf1: MYSUM(n2, n1, t)): MYSUM(n1, n1 + n2, t + n1 + n2)
+
+
+//
+(* ****** ****** *)
+
+praxi
+MYSUM_BAS (n2: int 1, n1: int 2, t: int 2):
+  [n1o,n2o,to:int | n1o == 2; n2o == 1; to == 2] MYSUM(n2o, n1o, to)
+
+
 //
 // TODO: annotate inputs with FIB relationship
 //
-fun mysum {n1,n2,t:nat} (x_n2: int n2, x_n1: int n1, tl: int t):
-[n1f,n2f,tf:int | n1f >= n1; n2f >= n2; tf >= t] (MYSUM (n2f, n1f, tf) | int tf)
+fun mysum (x_n2: int 1, x_n1: int 2, tl: int 2):
+  [n2f,n1f,tf: nat] (MYSUM (n2f, n1f, tf) | int tf)
 //
