@@ -25,6 +25,11 @@ staload "P2-bbarker.sats"
 //
 (* ****** ****** *)
 
+extern
+praxi
+my_mod2 {n:nat} (int(n)): [m:nat | m == n; m mod 2 == 0] int m //int(n%2)
+
+
 implement
 mysum (x_n2, x_n1, t) = let
 //
@@ -39,6 +44,7 @@ loop
 ) : [t1:nat] (MYSUM (ln1, ln1 + ln2, t1) | int t1) = let
 //
 val x_n = x_n1 + x_n2
+val (pf_r_xn | r_xn) =  nmod2_g1int_int1(x_n, 2)
 //
 (*
 val () =
@@ -52,8 +58,10 @@ x_n > LIMIT
 then (MYSUM_un_fin(pf1) | t)
 else (
   if nmod(x_n, 2) = 0
-    then loop( MYSUM_un_inc(pf1) | x_n1, x_n, t + x_n)
-    else loop( MYSUM_un_same(pf1) | x_n1, x_n, t)
+    then let prval pf_mod2 = my_mod2(x_n) in
+      loop( MYSUM_un_inc(pf1) | x_n1, x_n, t + x_n)
+    end
+  else loop( MYSUM_un_same(pf1) | x_n1, x_n, t)
   // end of [if]
 ) (* end of [else] *)
 end // end of [if]
